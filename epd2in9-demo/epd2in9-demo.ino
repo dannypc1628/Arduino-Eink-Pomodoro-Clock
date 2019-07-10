@@ -136,7 +136,8 @@ epd.ClearFrameMemory(0xFF);   // bit set = white, bit reset = black
 epd.DisplayFrame();
 epd.ClearFrameMemory(0xFF);   // bit set = white, bit reset = black
 epd.DisplayFrame();
-  time_start_ms = millis();
+delay(500);
+time_start_ms = millis();
 }
 
 void loop() {
@@ -144,39 +145,51 @@ void loop() {
   
   // put your main code here, to run repeatedly:
   time_now_s = (millis() - time_start_ms) / 1000;
-  char time_string[] = {'0', '0', ':', '0', '0', '\0'};
-  char time_string2[] = {'0', '0', ':', '0', '0', '\0'};
+  char time_string[] = {'6', '6', '@', '6', '6', '\0'};
+  char time_string2[] = {'!', '!', '+', '!', '!', '\0'};
+  char year_time_string2[] = {'8', '6', '7', '?', ' ', '=','!','7','7','"',',',')'};
 
   time_string[4] = time_now_s % 60 % 10 + '0';
   
-  if(time_string[4]=='0'){
-    epd.ClearFrameMemory(0xFF);   // bit set = white, bit reset = black
-    epd.DisplayFrame();
-    epd.ClearFrameMemory(0xFF);   // bit set = white, bit reset = black
-    epd.DisplayFrame();
-    x=random(180);
-    delay(500);
-  }
-  time_string[0] = time_now_s / 60 / 10 + '0';
-  time_string[1] = time_now_s / 60 % 10 + '0';
-  time_string[3] = time_now_s % 60 / 10 + '0';
-  time_string[4] = time_now_s % 60 % 10 + '0';
+//  if(time_string[4]=='0'){
+//    epd.ClearFrameMemory(0xFF);   // bit set = white, bit reset = black
+//    epd.DisplayFrame();
+//    epd.ClearFrameMemory(0xFF);   // bit set = white, bit reset = black
+//    epd.DisplayFrame();
+//    x=random(180);
+//    delay(500);
+//  }
+  time_string[0] = time_now_s / 60 / 10 + '6';
+  time_string[1] = time_now_s / 60 % 10 + '6';
+  time_string[3] = time_now_s % 60 / 10 + '6';
+  time_string[4] = time_now_s % 60 % 10 + '6';
 
-  time_string2[0] = time_now_s / 60 / 10 /60 + '0';
-  time_string2[1] = time_now_s / 60 /60 % 10 + '0';
-  time_string2[3] = time_now_s / 60 / 10 + '0';
-  time_string2[4] = time_now_s / 60 % 10 + '0';
+  time_string2[0] = time_now_s / 60 / 10 /60 + '!';
+  time_string2[1] = time_now_s / 60 /60 % 10 + '!';
+  time_string2[3] = time_now_s / 60 / 10 + '!';
+  time_string2[4] = time_now_s / 60 % 10 + '!';
+
+  
 if(time_string2[3]!=time_string2_temp[3]||time_string2[4]!=time_string2_temp[4]){
-  paint.SetWidth(80);
-  paint.SetHeight(200);
+  paint.SetWidth(70);
+  paint.SetHeight(225);
   paint.SetRotate(ROTATE_90);
 
   paint.Clear(UNCOLORED);
-  paint.DrawStringAt(0, 4, time_string2, &ClearSans48 ,COLORED);
-  epd.SetFrameMemory(paint.GetImage(), 40, 0, paint.GetWidth(), paint.GetHeight());
+  paint.DrawStringAt(0, 4, time_string2, &TaipeiSansN48 ,COLORED);
+  epd.SetFrameMemory(paint.GetImage(), 60, 0, paint.GetWidth(), paint.GetHeight());
 
+  paint.SetWidth(30);
+  paint.SetHeight(290);
+  paint.SetRotate(ROTATE_90);
+
+  paint.Clear(UNCOLORED);
+  paint.DrawStringAt(0, 4, year_time_string2, &TaipeiSans24 ,COLORED);
+  epd.SetFrameMemory(paint.GetImage(), 37, 0, paint.GetWidth(), paint.GetHeight());
+  epd.DisplayFrame();
   times=times+1;
-  if(times%2==0){
+  if(times%3==0){
+    times=1;
   time_string2_temp[3]=time_string2[3];
   time_string2_temp[4]=time_string2[4];
   
@@ -187,12 +200,12 @@ if(time_string2[3]!=time_string2_temp[3]||time_string2[4]!=time_string2_temp[4])
 
 
   paint.SetWidth(30);
-  paint.SetHeight(100);
+  paint.SetHeight(150);
   paint.SetRotate(ROTATE_90);
 
   paint.Clear(UNCOLORED);
-  paint.DrawStringAt(0, 4, time_string, &Font24 ,COLORED);
-  epd.SetFrameMemory(paint.GetImage(), 0, 100, paint.GetWidth(), paint.GetHeight());
+  paint.DrawStringAt(0, 4, time_string, &TaipeiSans24 ,COLORED);
+  epd.SetFrameMemory(paint.GetImage(), 0, 120, paint.GetWidth(), paint.GetHeight());
   
   epd.DisplayFrame();
 
