@@ -67,7 +67,7 @@ typedef struct _tFont
 //extern sFONT Font12;
 //extern sFONT Cer24;
 //extern sFONT  ClearSans48;
-extern sFONT TaipeiSans24;
+extern sFONT TaipeiSans20;
 extern sFONT TaipeiSansN48;
 #ifdef __cplusplus
 }

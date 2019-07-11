@@ -145,9 +145,9 @@ void loop() {
   
   // put your main code here, to run repeatedly:
   time_now_s = (millis() - time_start_ms) / 1000;
-  char time_string[] = {'6', '6', '@', '6', '6', '\0'};
+  char time_string[] = {'7', '7', 'A', '7', '7', '\0'};
   char time_string2[] = {'!', '!', '+', '!', '!', '\0'};
-  char year_time_string2[] = {'8', '6', '7', '?', ' ', '=','!','7','7','"',',',')'};
+  char year_time_string2[] = {'9', '6', '8', '?', ' ', '=','!','8','8','"',',',')'};
 
   time_string[4] = time_now_s % 60 % 10 + '0';
   
@@ -159,10 +159,10 @@ void loop() {
 //    x=random(180);
 //    delay(500);
 //  }
-  time_string[0] = time_now_s / 60 / 10 + '6';
-  time_string[1] = time_now_s / 60 % 10 + '6';
-  time_string[3] = time_now_s % 60 / 10 + '6';
-  time_string[4] = time_now_s % 60 % 10 + '6';
+  time_string[0] = time_now_s / 60 / 10 + '7';
+  time_string[1] = time_now_s / 60 % 10 + '7';
+  time_string[3] = time_now_s % 60 / 10 + '7';
+  time_string[4] = time_now_s % 60 % 10 + '7';
 
   time_string2[0] = time_now_s / 60 / 10 /60 + '!';
   time_string2[1] = time_now_s / 60 /60 % 10 + '!';
@@ -184,7 +184,7 @@ if(time_string2[3]!=time_string2_temp[3]||time_string2[4]!=time_string2_temp[4])
   paint.SetRotate(ROTATE_90);
 
   paint.Clear(UNCOLORED);
-  paint.DrawStringAt(0, 4, year_time_string2, &TaipeiSans24 ,COLORED);
+  paint.DrawStringAt(0, 4, year_time_string2, &TaipeiSans20 ,COLORED);
   epd.SetFrameMemory(paint.GetImage(), 37, 0, paint.GetWidth(), paint.GetHeight());
   epd.DisplayFrame();
   times=times+1;
@@ -204,7 +204,7 @@ if(time_string2[3]!=time_string2_temp[3]||time_string2[4]!=time_string2_temp[4])
   paint.SetRotate(ROTATE_90);
 
   paint.Clear(UNCOLORED);
-  paint.DrawStringAt(0, 4, time_string, &TaipeiSans24 ,COLORED);
+  paint.DrawStringAt(0, 4, time_string, &TaipeiSans20 ,COLORED);
   epd.SetFrameMemory(paint.GetImage(), 0, 120, paint.GetWidth(), paint.GetHeight());
   
   epd.DisplayFrame();
