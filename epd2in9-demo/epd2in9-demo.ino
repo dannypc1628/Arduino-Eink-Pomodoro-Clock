@@ -184,7 +184,7 @@ if(time_string2[3]!=time_string2_temp[3]||time_string2[4]!=time_string2_temp[4])
   paint.SetRotate(ROTATE_90);
 
   paint.Clear(UNCOLORED);
-  paint.DrawStringAt(0, 4, year_time_string2, &TaipeiSans20 ,COLORED);
+  paint.DrawStringAt(0, 4, year_time_string2, &TaipeiSans18 ,COLORED);
   epd.SetFrameMemory(paint.GetImage(), 37, 0, paint.GetWidth(), paint.GetHeight());
   epd.DisplayFrame();
   times=times+1;
@@ -204,7 +204,7 @@ if(time_string2[3]!=time_string2_temp[3]||time_string2[4]!=time_string2_temp[4])
   paint.SetRotate(ROTATE_90);
 
   paint.Clear(UNCOLORED);
-  paint.DrawStringAt(0, 4, time_string, &TaipeiSans20 ,COLORED);
+  paint.DrawStringAt(0, 4, time_string, &TaipeiSans18 ,COLORED);
   epd.SetFrameMemory(paint.GetImage(), 0, 120, paint.GetWidth(), paint.GetHeight());
   
   epd.DisplayFrame();
