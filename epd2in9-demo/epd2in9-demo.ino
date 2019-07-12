@@ -198,7 +198,17 @@ if(time_string2[3]!=time_string2_temp[3]||time_string2[4]!=time_string2_temp[4])
   
 }
 
+  int second,minute,hour,date,month,year,temperature; 
+  second=Clock.getSecond();
+  minute=Clock.getMinute();
+  h12=true;
+  hour=Clock.getHour(h12, PM);
+  wek=Clock.getDoW();
+  date=Clock.getDate();
+  month=Clock.getMonth(Century);
+  year=Clock.getYear();
 
+  
   paint.SetWidth(30);
   paint.SetHeight(150);
   paint.SetRotate(ROTATE_90);
@@ -210,4 +220,274 @@ if(time_string2[3]!=time_string2_temp[3]||time_string2[4]!=time_string2_temp[4])
   epd.DisplayFrame();
 
   delay(500);
+}
+
+void pTimer(int setMinute){
+  char time_string[] = {'0', '0', ':', '0', '0', '\0'};
+  int minute , second;
+  int minute_units_digit , minute_tens_digit; 
+  int second_units_digit , second_tens_digit; 
+
+  minute=Clock.getSecond();
+  second=Clock.getSecond();
+  
+  if(hour>9){
+    hour_tens_digit = hour/10; 
+    hour_units_digit = hour%10;
+  }
+  else{
+    hour_tens_digit = 0; 
+    hour_units_digit = hour%10;
+  }
+ 
+  time_string2[0] = hour_tens_digit + '0';
+  time_string2[1] = hour_units_digit + '0';
+  time_string2[3] = second_tens_digit + '0';
+  time_string2[4] = second_units_digit + '0';
+  
+  paint.SetWidth(70);
+  paint.SetHeight(225);
+  paint.SetRotate(ROTATE_90);
+
+  paint.Clear(UNCOLORED);
+  paint.DrawStringAt(0, 4, time_string2, &TaipeiSansN48 ,COLORED);
+  epd.SetFrameMemory(paint.GetImage(), 60, 0, paint.GetWidth(), paint.GetHeight());
+}
+void pClock(){
+  char time_string[] = {'0', '0', ':', '0', '0', '\0'};
+  int minute , hour;
+  int hour_units_digit , hour_tens_digit; 
+  int minute_units_digit , minute_tens_digit; 
+  
+  hour=Clock.getHour(false, false);
+  minute=Clock.getMinute();
+  if(hour>9){
+    hour_tens_digit = hour/10; 
+    hour_units_digit = hour%10;
+  }
+  else{
+    hour_tens_digit = 0; 
+    hour_units_digit = hour%10;
+  }
+  if(minute>9){
+    minute_tens_digit = minute/10; 
+    minute_units_digit = minute%10;
+  }
+  else{
+    minute_tens_digit = 0; 
+    minute_units_digit = minute%10;
+  }
+  time_string2[0] = hour_tens_digit + '0';
+  time_string2[1] = hour_units_digit + '0';
+  time_string2[3] = minute_tens_digit + '0';
+  time_string2[4] = minute_units_digit + '0';
+  
+  paint.SetWidth(70);
+  paint.SetHeight(225);
+  paint.SetRotate(ROTATE_90);
+
+  paint.Clear(UNCOLORED);
+  paint.DrawStringAt(0, 4, time_string2, &TaipeiSansN48 ,COLORED);
+  epd.SetFrameMemory(paint.GetImage(), 60, 0, paint.GetWidth(), paint.GetHeight());
+}
+void pToDay(){
+  String year_string="";
+  String month_string="";
+  String date_string="";
+  String concat_string="";
+  int year , month , date;
+  
+  year=Clock.getYear();
+  year_string ="20" +String.valueOf(year)+"年";
+
+  month=Clock.getMonth(Century);
+  month_string = String.valueOf(month)+"月";
+   
+  date=Clock.getDate();
+  date_string = String.valueOf(date)+"日";
+
+  concat_string = year_string + month_string + date_string;
+  char char_string[concat_string.length()+1];
+  concat_string.toCherArry(char_string,concat_string.length()+1);
+
+  paint.SetWidth(70);
+  paint.SetHeight(225);
+  paint.SetRotate(ROTATE_90);
+
+  paint.Clear(UNCOLORED);
+  paint.DrawStringAt(0, 4, concat_string, &TaipeiSansN48 ,COLORED);
+  epd.SetFrameMemory(paint.GetImage(), 60, 0, paint.GetWidth(), paint.GetHeight());
+}
+void pAMPM(){
+  }
+  
+char getFont48Char(char input){
+  char output='';
+
+  switch(input){
+
+    case '/':
+      output=' ';
+      break;
+    case '0':
+      output='!';
+      break;
+    case '1':
+      output='"';
+      break;
+    case '2':
+      output='#';
+      break;
+    case '3':
+      output='$';
+      break;
+    case '4':
+      output='%';
+      break;
+    case '5':
+      output='&';
+      break;
+    case '6':
+      output=',';
+      break;
+    case '7':
+      output='(';
+      break;
+    case '8':
+      output=')';
+      break;
+    case '9':
+      output='*';
+      break;
+    case ':':
+      output='+';
+      break;
+
+  }
+
+  return output;
+}
+
+  
+char getFont18Char(char input){
+  char output='';
+
+  switch(input){
+
+    case '年':
+      output=' ';
+      break;
+    case '月':
+      output='!';
+      break;
+    case '日':
+      output='"';
+      break;
+    case '時':
+      output='#';
+      break;
+    case '點':
+      output='$';
+      break;
+    case '分':
+      output='%';
+      break;
+    case '秒':
+      output='&';
+      break;
+    case '上':
+      output=',';
+      break;
+    case '下':
+      output='(';
+      break;
+    case '午':
+      output=')';
+      break;
+    case '星':
+      output='*';
+      break;
+    case '期':
+      output='+';
+      break;
+
+    case '一':
+      output=',';
+      break;
+    case '二':
+      output='-';
+      break;
+    case '三':
+      output='.';
+      break;
+    case '四':
+      output='/';
+      break;
+    case '五':
+      output='0';
+      break;
+    case '六':
+      output='1';
+      break;
+    case '日':
+      output='2';
+      break;
+    case ' ':
+      output='3';
+      break;
+    case '(':
+      output='4';
+      break;
+    case ')':
+      output='5';
+      break;
+    case '/':
+      output='6';
+      break;
+    case '0':
+      output='7';
+      break;
+
+    case '1':
+      output='8';
+      break;
+    case '2':
+      output='9';
+      break;
+    case '3':
+      output=':';
+      break;
+    case '4':
+      output=';';
+      break;
+    case '5':
+      output='<';
+      break;
+    case '6':
+      output='=';
+      break;
+    case '7':
+      output='>';
+      break;
+    case '8':
+      output='?';
+      break;
+    case '9':
+      output='@';
+      break;
+    case ':':
+      output='A';
+      break;
+    case 'A':
+      output='B';
+      break;
+    case 'P':
+      output='C';
+      break;
+    case 'M':
+      output='D';
+      break;
+  }
+
+  return output;
 }
