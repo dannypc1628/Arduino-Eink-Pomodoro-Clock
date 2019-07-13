@@ -48,10 +48,13 @@ unsigned long time_start_ms;
 unsigned long time_now_s;
 int x=0;
 int times=0;
+int lastMinute=0;
 
 bool h12=true;
 bool PM;
 bool Century=false;
+const int t25pin=5;
+const int t10pin=6;
 
 void setup() {
   // put your setup code here, to run once:
@@ -62,6 +65,8 @@ void setup() {
       return;
   }
 
+pinMode(t25pin,INPUT);
+pinMode(t10pin,INPUT);
   /** 
    *  there are 2 memory areas embedded in the e-paper display
    *  and once the display is refreshed, the memory area will be auto-toggled,
@@ -74,12 +79,12 @@ void setup() {
   epd.DisplayFrame();
 
   paint.SetRotate(ROTATE_90);
-  paint.SetWidth(12);
-  paint.SetHeight(64);
+  paint.SetWidth(30);
+  paint.SetHeight(90);
 
   /* For simplicity, the arguments are explicit numerical coordinates */
   paint.Clear(UNCOLORED);
-  paint.DrawStringAt(0, 4, "Hello world!", &Font24, COLORED);
+  paint.DrawStringAt(0, 4, "Hello world!", &TaipeiSans18, COLORED);
   epd.SetFrameMemory(paint.GetImage(), 30, 10, paint.GetWidth(), paint.GetHeight());
   epd.DisplayFrame();
   delay(3000);
@@ -201,21 +206,33 @@ void loop() {
   Serial.print("Second  is ");
   Serial.print( sec,DEC);
   Serial.print("\n");
-  pTimer(sec);
+
+  int val25 = digitalRead(t25pin);
+  int val10 = digitalRead(t10pin);
+  if(val25 ==HIGH){
+    pTimer(25);
+  }
+  if(val10==HIGH){
+    pTimer(10);
+  }
+  else{
+    pTimer(sec);
+    }
+  
   delay(500);
 
 //pFont1();
 //delay(3000);
 //pFont2();
 
-//  Serial.print("pClock");
-//  Serial.print('\n');
-//  pClock();  
+  Serial.print("pClock");
+  Serial.print('\n');
+  pClock();  
   //delay(1000);
   
-//  Serial.print("pToDay");
-//  Serial.print('\n');
-//  pToDay();
+  Serial.print("pToDay");
+  Serial.print('\n');
+  pToDay();
 //  
   //delay(1000);
 }
@@ -241,16 +258,16 @@ void pTimer(int setMinute){
   time_string[3] =  '0';
   time_string[4] =  '0';
   Serial.print("inside "+ String(time_string));
-//  for(int i =0 ;i<5;i++){
-//    time_string[i]= getFont18Char(time_string[i]);
-//  }
+  for(int i =0 ;i<5;i++){
+    time_string[i]= getFont18Char(time_string[i]);
+  }
   
   paint.SetWidth(30);
   paint.SetHeight(125);
   paint.SetRotate(ROTATE_90);
 
   paint.Clear(UNCOLORED);
-  paint.DrawStringAt(0, 4, time_string, &Font24 ,COLORED);
+  paint.DrawStringAt(0, 4, time_string, &TaipeiSans18 ,COLORED);
   Serial.print("SetFrameMemory");
   epd.SetFrameMemory(paint.GetImage(), 0, 180, paint.GetWidth(), paint.GetHeight());
   Serial.print("DisplayFrame");
@@ -289,8 +306,12 @@ void pClock(){
   int hour_units_digit , hour_tens_digit; 
   int minute_units_digit , minute_tens_digit; 
   
+  
   hour=Clock.getHour(h12, PM);
   minute=Clock.getMinute();
+
+
+  
   if(hour>9){
     hour_tens_digit = hour/10; 
     hour_units_digit = hour%10;
@@ -317,14 +338,29 @@ void pClock(){
 //  }
   
   paint.SetWidth(40);
-  paint.SetHeight(100);
+  paint.SetHeight(150);
   paint.SetRotate(ROTATE_90);
    Serial.print("pclock  ROTATE_90");
   Serial.print('\n');
   paint.Clear(UNCOLORED);
   paint.DrawStringAt(0, 4, time_string, &Font24 ,COLORED);
-  epd.SetFrameMemory(paint.GetImage(), 80, 0, paint.GetWidth(), paint.GetHeight());
-  //epd.DisplayFrame();
+  
+if(minute!=lastMinute){
+    epd.ClearFrameMemory(0xFF);   // bit set = white, bit reset = black
+    epd.DisplayFrame();
+    epd.ClearFrameMemory(0xFF);   // bit set = white, bit reset = black
+    epd.DisplayFrame();
+
+    epd.SetFrameMemory(paint.GetImage(), 80, 0, paint.GetWidth(), paint.GetHeight());
+   
+    epd.DisplayFrame();
+        epd.SetFrameMemory(paint.GetImage(), 80, 0, paint.GetWidth(), paint.GetHeight());
+   
+    epd.DisplayFrame();
+    lastMinute=minute;
+}
+  
+ // epd.DisplayFrame();
 }
 void pToDay(){
   String year_string="";
