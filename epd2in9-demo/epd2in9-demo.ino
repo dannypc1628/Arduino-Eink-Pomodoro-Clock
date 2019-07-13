@@ -24,6 +24,8 @@
  * THE SOFTWARE.
  */
 
+#include "DS3231.h"
+#include <Wire.h>
 #include <SPI.h>
 #include "epd2in9.h"
 #include "epdpaint.h"
@@ -32,6 +34,7 @@
 #define COLORED     0
 #define UNCOLORED   1
 
+DS3231 Clock;
 /**
   * Due to RAM not enough in Arduino UNO, a frame buffer is not allowed.
   * In this case, a smaller image buffer is allocated and you have to 
@@ -45,11 +48,15 @@ unsigned long time_start_ms;
 unsigned long time_now_s;
 int x=0;
 int times=0;
-char time_string2_temp[]= {'0', '0', ':', ':', ':', '\0'};
+
+bool h12=true;
+bool PM;
+bool Century=false;
 
 void setup() {
   // put your setup code here, to run once:
-  Serial.begin(9600);
+  Wire.begin();
+  Serial.begin(115200);
   if (epd.Init(lut_full_update) != 0) {
       Serial.print("e-Paper init failed");
       return;
@@ -66,16 +73,16 @@ void setup() {
   epd.ClearFrameMemory(0xFF);   // bit set = white, bit reset = black
   epd.DisplayFrame();
 
-//  paint.SetRotate(ROTATE_90);
-//  paint.SetWidth(12);
-//  paint.SetHeight(64);
-//
-//  /* For simplicity, the arguments are explicit numerical coordinates */
-//  paint.Clear(COLORED);
-//  paint.DrawStringAt(0, 4, "Hello world!", &Font16, COLORED);
-//  epd.SetFrameMemory(paint.GetImage(), 0, 10, paint.GetWidth(), paint.GetHeight());
-//  epd.DisplayFrame();
-//  delay(1500);
+  paint.SetRotate(ROTATE_90);
+  paint.SetWidth(12);
+  paint.SetHeight(64);
+
+  /* For simplicity, the arguments are explicit numerical coordinates */
+  paint.Clear(UNCOLORED);
+  paint.DrawStringAt(0, 4, "Hello world!", &Font12, COLORED);
+  epd.SetFrameMemory(paint.GetImage(), 0, 10, paint.GetWidth(), paint.GetHeight());
+  epd.DisplayFrame();
+  delay(3000);
 //  
 //  
 //  paint.Clear(UNCOLORED);
@@ -103,7 +110,9 @@ void setup() {
 //  paint.DrawFilledRectangle(0, 0, 40, 50, COLORED);
 //  epd.SetFrameMemory(paint.GetImage(), 16, 130, paint.GetWidth(), paint.GetHeight());
 //  delay(1500);
-//
+//  
+//  paint.SetWidth(64);
+//  paint.SetHeight(64);
 //  paint.Clear(UNCOLORED);
 //  paint.DrawFilledCircle(32, 32, 30, COLORED);
 //  epd.SetFrameMemory(paint.GetImage(), 72, 130, paint.GetWidth(), paint.GetHeight());
@@ -126,140 +135,151 @@ void setup() {
 //  epd.DisplayFrame();
 //  epd.SetFrameMemory(IMAGE_DATA2);
 //  epd.DisplayFrame();
-
-epd.ClearFrameMemory(0xFF);   // bit set = white, bit reset = black
-epd.DisplayFrame();
-epd.ClearFrameMemory(0xFF);   // bit set = white, bit reset = black
-epd.DisplayFrame();
-
+//
+//epd.ClearFrameMemory(0xFF);   // bit set = white, bit reset = black
+//epd.DisplayFrame();
+//epd.ClearFrameMemory(0xFF);   // bit set = white, bit reset = black
+//epd.DisplayFrame();
+//
 epd.ClearFrameMemory(0xFF);   // bit set = white, bit reset = black
 epd.DisplayFrame();
 epd.ClearFrameMemory(0xFF);   // bit set = white, bit reset = black
 epd.DisplayFrame();
 delay(500);
-time_start_ms = millis();
+
 }
 
 void loop() {
-
-  
-  // put your main code here, to run repeatedly:
-  time_now_s = (millis() - time_start_ms) / 1000;
-  char time_string[] = {'7', '7', 'A', '7', '7', '\0'};
-  char time_string2[] = {'!', '!', '+', '!', '!', '\0'};
-  char year_time_string2[] = {'9', '6', '8', '?', ' ', '=','!','8','8','"',',',')'};
-
-  time_string[4] = time_now_s % 60 % 10 + '0';
-  
-//  if(time_string[4]=='0'){
-//    epd.ClearFrameMemory(0xFF);   // bit set = white, bit reset = black
-//    epd.DisplayFrame();
-//    epd.ClearFrameMemory(0xFF);   // bit set = white, bit reset = black
-//    epd.DisplayFrame();
-//    x=random(180);
-//    delay(500);
-//  }
-  time_string[0] = time_now_s / 60 / 10 + '7';
-  time_string[1] = time_now_s / 60 % 10 + '7';
-  time_string[3] = time_now_s % 60 / 10 + '7';
-  time_string[4] = time_now_s % 60 % 10 + '7';
-
-  time_string2[0] = time_now_s / 60 / 10 /60 + '!';
-  time_string2[1] = time_now_s / 60 /60 % 10 + '!';
-  time_string2[3] = time_now_s / 60 / 10 + '!';
-  time_string2[4] = time_now_s / 60 % 10 + '!';
-
-  
-if(time_string2[3]!=time_string2_temp[3]||time_string2[4]!=time_string2_temp[4]){
-  paint.SetWidth(70);
-  paint.SetHeight(225);
-  paint.SetRotate(ROTATE_90);
-
-  paint.Clear(UNCOLORED);
-  paint.DrawStringAt(0, 4, time_string2, &TaipeiSansN48 ,COLORED);
-  epd.SetFrameMemory(paint.GetImage(), 60, 0, paint.GetWidth(), paint.GetHeight());
-
-  paint.SetWidth(30);
-  paint.SetHeight(290);
-  paint.SetRotate(ROTATE_90);
-
-  paint.Clear(UNCOLORED);
-  paint.DrawStringAt(0, 4, year_time_string2, &TaipeiSans18 ,COLORED);
-  epd.SetFrameMemory(paint.GetImage(), 37, 0, paint.GetWidth(), paint.GetHeight());
-  epd.DisplayFrame();
-  times=times+1;
-  if(times%3==0){
-    times=1;
-  time_string2_temp[3]=time_string2[3];
-  time_string2_temp[4]=time_string2[4];
-  
-  }
- 
-  
-}
-
-  int second,minute,hour,date,month,year,temperature; 
+int second,minute,hour,date,month,year,temperature; 
   second=Clock.getSecond();
   minute=Clock.getMinute();
   h12=true;
   hour=Clock.getHour(h12, PM);
-  wek=Clock.getDoW();
+
   date=Clock.getDate();
   month=Clock.getMonth(Century);
   year=Clock.getYear();
+  
+  temperature=Clock.getTemperature();
+  
+  Serial.print("20");
+  Serial.print(year,DEC);
+  Serial.print('-');
+  Serial.print(month,DEC);
+  Serial.print('-');
+  Serial.print(date,DEC);
+  Serial.print(' ');
 
+  Serial.print(' ');
+  Serial.print(hour,DEC);  
+  Serial.print(' ');
+    if (h12) {
+    if (PM) {
+      Serial.print(" PM ");
+    } else {
+      Serial.print(" AM ");
+    }
+  } else {
+    Serial.print(" 24h ");
+  }
+  Serial.print(minute,DEC);
+  Serial.print(':');
+  Serial.print(second,DEC);
+  Serial.print('\n');
+  Serial.print("Temperature=");
+  Serial.print(temperature); 
+  Serial.print('\n');
+  
+  Serial.print("pTimer");
+  Serial.print('\n');
+  
+  int sec =Clock.getSecond();
+  pTimer(second);
+  delay(3000);
+
+//pFont1();
+//delay(3000);
+//pFont2();
+
+  Serial.print("pClock");
+  Serial.print('\n');
+  pClock();  
+  delay(3000);
+  
+  Serial.print("pToDay");
+  Serial.print('\n');
+  pToDay();
+  
+  delay(3000);
+}
+
+ 
+
+void pTimer(int setMinute){
+  char time_string[] = {'0', '0', ':', '0', '0', '\0'};
+ 
+  int minute_units_digit , minute_tens_digit; 
+
+  if(setMinute>9){
+    minute_tens_digit = setMinute/10; 
+    minute_units_digit = setMinute%10;
+  }
+  else{
+    minute_tens_digit = 0; 
+    minute_units_digit = setMinute%10;
+  }
+ 
+  time_string[0] = minute_tens_digit + '0';
+  time_string[1] = minute_units_digit + '0';
+  time_string[3] =  '0';
+  time_string[4] =  '0';
+  Serial.print("inside "+ String(time_string));
+  for(int i =0 ;i<5;i++){
+    time_string[i]= getFont18Char(time_string[i]);
+  }
   
   paint.SetWidth(30);
-  paint.SetHeight(150);
+  paint.SetHeight(100);
   paint.SetRotate(ROTATE_90);
 
   paint.Clear(UNCOLORED);
   paint.DrawStringAt(0, 4, time_string, &TaipeiSans18 ,COLORED);
-  epd.SetFrameMemory(paint.GetImage(), 0, 120, paint.GetWidth(), paint.GetHeight());
-  
+  epd.SetFrameMemory(paint.GetImage(), 0, 180, paint.GetWidth(), paint.GetHeight());
   epd.DisplayFrame();
-
-  delay(500);
 }
-
-void pTimer(int setMinute){
-  char time_string[] = {'0', '0', ':', '0', '0', '\0'};
-  int minute , second;
-  int minute_units_digit , minute_tens_digit; 
-  int second_units_digit , second_tens_digit; 
-
-  minute=Clock.getSecond();
-  second=Clock.getSecond();
-  
-  if(hour>9){
-    hour_tens_digit = hour/10; 
-    hour_units_digit = hour%10;
-  }
-  else{
-    hour_tens_digit = 0; 
-    hour_units_digit = hour%10;
-  }
- 
-  time_string2[0] = hour_tens_digit + '0';
-  time_string2[1] = hour_units_digit + '0';
-  time_string2[3] = second_tens_digit + '0';
-  time_string2[4] = second_units_digit + '0';
-  
-  paint.SetWidth(70);
-  paint.SetHeight(225);
-  paint.SetRotate(ROTATE_90);
-
-  paint.Clear(UNCOLORED);
-  paint.DrawStringAt(0, 4, time_string2, &TaipeiSansN48 ,COLORED);
-  epd.SetFrameMemory(paint.GetImage(), 60, 0, paint.GetWidth(), paint.GetHeight());
-}
+//void pFont1(){
+//  char st[]={' ','!','"','#','$','%','&','\'','(','\0'};
+//  paint.SetWidth(30);
+//  paint.SetHeight(290);
+//  paint.SetRotate(ROTATE_90);
+//
+//  paint.Clear(UNCOLORED);
+//  paint.DrawStringAt(0, 4, st, &TaipeiSans18 ,COLORED);
+//  epd.SetFrameMemory(paint.GetImage(), 60, 0, paint.GetWidth(), paint.GetHeight());
+//  epd.DisplayFrame();
+//}
+//void pFont2(){
+//  char st[]={'年','月','日','時','分','秒','上','\0'};
+//  for(int i =0 ;i<3;i++){
+//    st[i]= getFont18Char(st[i]);
+//  }
+//  
+//  paint.SetWidth(60);
+//  paint.SetHeight(200);
+//  paint.SetRotate(ROTATE_90);
+//
+//  paint.Clear(UNCOLORED);
+//  paint.DrawStringAt(0, 4, st, &TaipeiSans18 ,COLORED);
+//  epd.SetFrameMemory(paint.GetImage(), 80, 0, paint.GetWidth(), paint.GetHeight());
+//  epd.DisplayFrame();
+//}
 void pClock(){
   char time_string[] = {'0', '0', ':', '0', '0', '\0'};
   int minute , hour;
   int hour_units_digit , hour_tens_digit; 
   int minute_units_digit , minute_tens_digit; 
   
-  hour=Clock.getHour(false, false);
+  hour=Clock.getHour(h12, PM);
   minute=Clock.getMinute();
   if(hour>9){
     hour_tens_digit = hour/10; 
@@ -277,18 +297,23 @@ void pClock(){
     minute_tens_digit = 0; 
     minute_units_digit = minute%10;
   }
-  time_string2[0] = hour_tens_digit + '0';
-  time_string2[1] = hour_units_digit + '0';
-  time_string2[3] = minute_tens_digit + '0';
-  time_string2[4] = minute_units_digit + '0';
+  time_string[0] = hour_tens_digit + '0';
+  time_string[1] = hour_units_digit + '0';
+  time_string[3] = minute_tens_digit + '0';
+  time_string[4] = minute_units_digit + '0';
+  Serial.print("clock is  "+ String(time_string));
+  for(int i =0 ;i<5;i++){
+    time_string[i]= getFont48Char(time_string[i]);
+  }
   
   paint.SetWidth(70);
-  paint.SetHeight(225);
+  paint.SetHeight(200);
   paint.SetRotate(ROTATE_90);
 
   paint.Clear(UNCOLORED);
-  paint.DrawStringAt(0, 4, time_string2, &TaipeiSansN48 ,COLORED);
+  paint.DrawStringAt(0, 4, time_string, &TaipeiSansN48 ,COLORED);
   epd.SetFrameMemory(paint.GetImage(), 60, 0, paint.GetWidth(), paint.GetHeight());
+  epd.DisplayFrame();
 }
 void pToDay(){
   String year_string="";
@@ -298,31 +323,45 @@ void pToDay(){
   int year , month , date;
   
   year=Clock.getYear();
-  year_string ="20" +String.valueOf(year)+"年";
-
+  year_string =String(year)+" ";
+  Serial.print("get year is ");
+  Serial.print(year_string);
   month=Clock.getMonth(Century);
-  month_string = String.valueOf(month)+"月";
+  month_string = String(month)+"!";
    
   date=Clock.getDate();
-  date_string = String.valueOf(date)+"日";
+  date_string = String(date)+"\"";
 
   concat_string = year_string + month_string + date_string;
-  char char_string[concat_string.length()+1];
-  concat_string.toCherArry(char_string,concat_string.length()+1);
-
-  paint.SetWidth(70);
-  paint.SetHeight(225);
+  
+  int len=concat_string.length()+1;
+  char char_string[len];
+  
+  concat_string.toCharArray(char_string,len);
+  
+//  Serial.print("\n");
+//  Serial.print(concat_string);
+//  for(int i=0;i<len-1;i++){
+//    char_string[i]=getFont18Char(char_string[i]);
+//  }
+//  Serial.print("字元轉換 \n");
+//  Serial.print(char_string);
+//  Serial.print("\n");
+  
+  paint.SetWidth(30);
+  paint.SetHeight(200);
   paint.SetRotate(ROTATE_90);
 
   paint.Clear(UNCOLORED);
-  paint.DrawStringAt(0, 4, concat_string, &TaipeiSansN48 ,COLORED);
-  epd.SetFrameMemory(paint.GetImage(), 60, 0, paint.GetWidth(), paint.GetHeight());
+  paint.DrawStringAt(0, 4, char_string, &TaipeiSans18 ,COLORED);
+  epd.SetFrameMemory(paint.GetImage(), 30, 0, paint.GetWidth(), paint.GetHeight());
+  epd.DisplayFrame();
 }
 void pAMPM(){
   }
   
 char getFont48Char(char input){
-  char output='';
+  char output=' ';
 
   switch(input){
 
@@ -348,7 +387,7 @@ char getFont48Char(char input){
       output='&';
       break;
     case '6':
-      output=',';
+      output='\'';
       break;
     case '7':
       output='(';
@@ -370,7 +409,7 @@ char getFont48Char(char input){
 
   
 char getFont18Char(char input){
-  char output='';
+  char output=' ';
 
   switch(input){
 
@@ -478,14 +517,20 @@ char getFont18Char(char input){
     case ':':
       output='A';
       break;
-    case 'A':
+    case '倒':
       output='B';
       break;
-    case 'P':
+    case '數':
       output='C';
       break;
-    case 'M':
+    case 'A':
       output='D';
+      break;
+    case 'P':
+      output='E';
+      break;
+    case 'M':
+      output='F';
       break;
   }
 
