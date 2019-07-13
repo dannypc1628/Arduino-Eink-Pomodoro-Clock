@@ -83,11 +83,11 @@ pinMode(t10pin,INPUT);
   paint.SetHeight(90);
 
   /* For simplicity, the arguments are explicit numerical coordinates */
-  paint.Clear(UNCOLORED);
-  paint.DrawStringAt(0, 4, "Hello world!", &TaipeiSans18, COLORED);
-  epd.SetFrameMemory(paint.GetImage(), 30, 10, paint.GetWidth(), paint.GetHeight());
-  epd.DisplayFrame();
-  delay(3000);
+//  paint.Clear(UNCOLORED);
+//  paint.DrawStringAt(0, 4, "Hello world!", &TaipeiSans18, COLORED);
+//  epd.SetFrameMemory(paint.GetImage(), 30, 10, paint.GetWidth(), paint.GetHeight());
+//  epd.DisplayFrame();
+//  delay(3000);
 //  
 //  
 //  paint.Clear(UNCOLORED);
@@ -267,7 +267,7 @@ void pTimer(int setMinute){
   paint.SetRotate(ROTATE_90);
 
   paint.Clear(UNCOLORED);
-  paint.DrawStringAt(0, 4, time_string, &TaipeiSans18 ,COLORED);
+  paint.DrawStringAt(0, 4, time_string, &Genyog12 ,COLORED);
   Serial.print("SetFrameMemory");
   epd.SetFrameMemory(paint.GetImage(), 0, 180, paint.GetWidth(), paint.GetHeight());
   Serial.print("DisplayFrame");
@@ -333,9 +333,9 @@ void pClock(){
   time_string[3] = minute_tens_digit + '0';
   time_string[4] = minute_units_digit + '0';
   Serial.print("clock is  "+ String(time_string));
-//  for(int i =0 ;i<5;i++){
-//    time_string[i]= getFont48Char(time_string[i]);
-//  }
+  for(int i =0 ;i<5;i++){
+    time_string[i]= getFont48Char(time_string[i]);
+  }
   
   paint.SetWidth(40);
   paint.SetHeight(150);
@@ -343,7 +343,7 @@ void pClock(){
    Serial.print("pclock  ROTATE_90");
   Serial.print('\n');
   paint.Clear(UNCOLORED);
-  paint.DrawStringAt(0, 4, time_string, &Font24 ,COLORED);
+  paint.DrawStringAt(0, 4, time_string, &NotoJP50 ,COLORED);
   
 if(minute!=lastMinute){
     epd.ClearFrameMemory(0xFF);   // bit set = white, bit reset = black
@@ -409,7 +409,7 @@ void pToDay(){
   paint.SetRotate(ROTATE_90);
 
   paint.Clear(UNCOLORED);
-  paint.DrawStringAt(0, 4, char_string, &TaipeiSans18 ,COLORED);
+  paint.DrawStringAt(0, 4, char_string, &Genyog12 ,COLORED);
   epd.SetFrameMemory(paint.GetImage(), 30, 0, paint.GetWidth(), paint.GetHeight());
   //epd.DisplayFrame();
 }
