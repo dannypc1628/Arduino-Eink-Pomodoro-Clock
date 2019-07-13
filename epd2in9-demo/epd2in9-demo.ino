@@ -56,7 +56,7 @@ bool Century=false;
 void setup() {
   // put your setup code here, to run once:
   Wire.begin();
-  Serial.begin(115200);
+  Serial.begin(9600);
   if (epd.Init(lut_full_update) != 0) {
       Serial.print("e-Paper init failed");
       return;
@@ -79,7 +79,7 @@ void setup() {
 
   /* For simplicity, the arguments are explicit numerical coordinates */
   paint.Clear(UNCOLORED);
-  paint.DrawStringAt(0, 4, "Hello world!", &Font12, COLORED);
+  paint.DrawStringAt(0, 4, "Hello world!", &Font24, COLORED);
   epd.SetFrameMemory(paint.GetImage(), 30, 10, paint.GetWidth(), paint.GetHeight());
   epd.DisplayFrame();
   delay(3000);
@@ -152,52 +152,57 @@ delay(500);
 }
 
 void loop() {
-int second,minute,hour,date,month,year,temperature; 
-  second=Clock.getSecond();
-  minute=Clock.getMinute();
-  h12=true;
-  hour=Clock.getHour(h12, PM);
+//int second,minute,hour,date,month,year,temperature; 
+//  second=Clock.getSecond();
+//  minute=Clock.getMinute();
+//  h12=true;
+//  hour=Clock.getHour(h12, PM);
+//
+//  date=Clock.getDate();
+//  month=Clock.getMonth(Century);
+//  year=Clock.getYear();
+//  
+//  //temperature=Clock.getTemperature();
+//  
+//  Serial.print("20");
+//  Serial.print(year,DEC);
+//  Serial.print('-');
+//  Serial.print(month,DEC);
+//  Serial.print('-');
+//  Serial.print(date,DEC);
+//  Serial.print(' ');
+//
+//  Serial.print(' ');
+//  Serial.print(hour,DEC);  
+//  Serial.print(' ');
+//    if (h12) {
+//    if (PM) {
+//      Serial.print(" PM ");
+//    } else {
+//      Serial.print(" AM ");
+//    }
+//  } else {
+//    Serial.print(" 24h ");
+//  }
+//  Serial.print(minute,DEC);
+//  Serial.print(':');
+//  Serial.print(second,DEC);
+//  Serial.print('\n');
+//  //Serial.print("Temperature=");
+//  //Serial.print(temperature); 
+//  Serial.print('\n');
+//  
+//  Serial.print("pTimer");
+//  Serial.print('\n');
 
-  date=Clock.getDate();
-  month=Clock.getMonth(Century);
-  year=Clock.getYear();
-  
-  temperature=Clock.getTemperature();
-  
-  Serial.print("20");
-  Serial.print(year,DEC);
-  Serial.print('-');
-  Serial.print(month,DEC);
-  Serial.print('-');
-  Serial.print(date,DEC);
-  Serial.print(' ');
-
-  Serial.print(' ');
-  Serial.print(hour,DEC);  
-  Serial.print(' ');
-    if (h12) {
-    if (PM) {
-      Serial.print(" PM ");
-    } else {
-      Serial.print(" AM ");
-    }
-  } else {
-    Serial.print(" 24h ");
-  }
-  Serial.print(minute,DEC);
-  Serial.print(':');
-  Serial.print(second,DEC);
-  Serial.print('\n');
-  Serial.print("Temperature=");
-  Serial.print(temperature); 
-  Serial.print('\n');
-  
-  Serial.print("pTimer");
-  Serial.print('\n');
-  
+  Serial.print("wait to getSecond()");
+  Serial.print("\n");
   int sec =Clock.getSecond();
-  pTimer(second);
-  delay(3000);
+  Serial.print("Second  is ");
+  Serial.print( sec,DEC);
+  Serial.print("\n");
+  pTimer(sec);
+  delay(500);
 
 //pFont1();
 //delay(3000);
@@ -206,13 +211,13 @@ int second,minute,hour,date,month,year,temperature;
 //  Serial.print("pClock");
 //  Serial.print('\n');
 //  pClock();  
-//  delay(3000);
+  //delay(1000);
   
-  Serial.print("pToDay");
-  Serial.print('\n');
-  pToDay();
-  
-  delay(3000);
+//  Serial.print("pToDay");
+//  Serial.print('\n');
+//  pToDay();
+//  
+  //delay(1000);
 }
 
  
@@ -236,18 +241,21 @@ void pTimer(int setMinute){
   time_string[3] =  '0';
   time_string[4] =  '0';
   Serial.print("inside "+ String(time_string));
-  for(int i =0 ;i<5;i++){
-    time_string[i]= getFont18Char(time_string[i]);
-  }
+//  for(int i =0 ;i<5;i++){
+//    time_string[i]= getFont18Char(time_string[i]);
+//  }
   
   paint.SetWidth(30);
   paint.SetHeight(125);
   paint.SetRotate(ROTATE_90);
 
   paint.Clear(UNCOLORED);
-  paint.DrawStringAt(0, 4, time_string, &TaipeiSans18 ,COLORED);
+  paint.DrawStringAt(0, 4, time_string, &Font24 ,COLORED);
+  Serial.print("SetFrameMemory");
   epd.SetFrameMemory(paint.GetImage(), 0, 180, paint.GetWidth(), paint.GetHeight());
+  Serial.print("DisplayFrame");
   epd.DisplayFrame();
+  Serial.print("Finish");
 }
 //void pFont1(){
 //  char st[]={' ','!','"','#','$','%','&','\'','(','\0'};
@@ -304,19 +312,19 @@ void pClock(){
   time_string[3] = minute_tens_digit + '0';
   time_string[4] = minute_units_digit + '0';
   Serial.print("clock is  "+ String(time_string));
-  for(int i =0 ;i<5;i++){
-    time_string[i]= getFont48Char(time_string[i]);
-  }
+//  for(int i =0 ;i<5;i++){
+//    time_string[i]= getFont48Char(time_string[i]);
+//  }
   
-  paint.SetWidth(70);
-  paint.SetHeight(200);
+  paint.SetWidth(40);
+  paint.SetHeight(100);
   paint.SetRotate(ROTATE_90);
    Serial.print("pclock  ROTATE_90");
   Serial.print('\n');
   paint.Clear(UNCOLORED);
-  paint.DrawStringAt(0, 4, time_string, &TaipeiSansN48 ,COLORED);
-  epd.SetFrameMemory(paint.GetImage(), 60, 0, paint.GetWidth(), paint.GetHeight());
-  epd.DisplayFrame();
+  paint.DrawStringAt(0, 4, time_string, &Font24 ,COLORED);
+  epd.SetFrameMemory(paint.GetImage(), 80, 0, paint.GetWidth(), paint.GetHeight());
+  //epd.DisplayFrame();
 }
 void pToDay(){
   String year_string="";
