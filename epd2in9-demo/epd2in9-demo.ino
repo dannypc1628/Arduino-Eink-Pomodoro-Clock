@@ -80,7 +80,7 @@ void setup() {
   /* For simplicity, the arguments are explicit numerical coordinates */
   paint.Clear(UNCOLORED);
   paint.DrawStringAt(0, 4, "Hello world!", &Font12, COLORED);
-  epd.SetFrameMemory(paint.GetImage(), 0, 10, paint.GetWidth(), paint.GetHeight());
+  epd.SetFrameMemory(paint.GetImage(), 30, 10, paint.GetWidth(), paint.GetHeight());
   epd.DisplayFrame();
   delay(3000);
 //  
@@ -143,6 +143,8 @@ void setup() {
 //
 epd.ClearFrameMemory(0xFF);   // bit set = white, bit reset = black
 epd.DisplayFrame();
+delay(500);
+
 epd.ClearFrameMemory(0xFF);   // bit set = white, bit reset = black
 epd.DisplayFrame();
 delay(500);
@@ -201,10 +203,10 @@ int second,minute,hour,date,month,year,temperature;
 //delay(3000);
 //pFont2();
 
-  Serial.print("pClock");
-  Serial.print('\n');
-  pClock();  
-  delay(3000);
+//  Serial.print("pClock");
+//  Serial.print('\n');
+//  pClock();  
+//  delay(3000);
   
   Serial.print("pToDay");
   Serial.print('\n');
@@ -239,7 +241,7 @@ void pTimer(int setMinute){
   }
   
   paint.SetWidth(30);
-  paint.SetHeight(100);
+  paint.SetHeight(125);
   paint.SetRotate(ROTATE_90);
 
   paint.Clear(UNCOLORED);
@@ -309,7 +311,8 @@ void pClock(){
   paint.SetWidth(70);
   paint.SetHeight(200);
   paint.SetRotate(ROTATE_90);
-
+   Serial.print("pclock  ROTATE_90");
+  Serial.print('\n');
   paint.Clear(UNCOLORED);
   paint.DrawStringAt(0, 4, time_string, &TaipeiSansN48 ,COLORED);
   epd.SetFrameMemory(paint.GetImage(), 60, 0, paint.GetWidth(), paint.GetHeight());
@@ -321,41 +324,50 @@ void pToDay(){
   String date_string="";
   String concat_string="";
   int year , month , date;
+
+    Serial.print("pToDay  1");
+  Serial.print('\n');
   
   year=Clock.getYear();
-  year_string =String(year)+" ";
-  Serial.print("get year is ");
+  year_string ="20"+String(year)+" ";//年
+  Serial.print("pToDay 2  get year is ");
   Serial.print(year_string);
+  Serial.print("\n");
   month=Clock.getMonth(Century);
-  month_string = String(month)+"!";
+  month_string = String(month)+"!";//月
    
   date=Clock.getDate();
-  date_string = String(date)+"\"";
-
+  date_string = String(date)+"\"";//日
+  Serial.print("pToDay  3");
+  Serial.print('\n');
   concat_string = year_string + month_string + date_string;
   
   int len=concat_string.length()+1;
   char char_string[len];
-  
+    Serial.print("pToDay  4");
+  Serial.print('\n');
   concat_string.toCharArray(char_string,len);
   
 //  Serial.print("\n");
 //  Serial.print(concat_string);
-//  for(int i=0;i<len-1;i++){
-//    char_string[i]=getFont18Char(char_string[i]);
-//  }
+  for(int i=0;i<len-1;i++){
+    if(char_string[i]>='0'){
+      char_string[i]=getFont18Char(char_string[i]);
+    }
+  }
 //  Serial.print("字元轉換 \n");
 //  Serial.print(char_string);
 //  Serial.print("\n");
-  
+    Serial.print("pToDay  5");
+  Serial.print('\n');
   paint.SetWidth(30);
-  paint.SetHeight(200);
+  paint.SetHeight(250);
   paint.SetRotate(ROTATE_90);
 
   paint.Clear(UNCOLORED);
   paint.DrawStringAt(0, 4, char_string, &TaipeiSans18 ,COLORED);
   epd.SetFrameMemory(paint.GetImage(), 30, 0, paint.GetWidth(), paint.GetHeight());
-  epd.DisplayFrame();
+  //epd.DisplayFrame();
 }
 void pAMPM(){
   }
