@@ -34,6 +34,16 @@
 #define COLORED     0
 #define UNCOLORED   1
 
+
+#define Do  523
+#define Re  587
+#define Mi  659
+#define Fa  698
+#define So  784
+#define La  880
+#define Si  988
+
+
 DS3231 Clock;
 /**
   * Due to RAM not enough in Arduino UNO, a frame buffer is not allowed.
@@ -55,8 +65,10 @@ int TimerSecond=0;
 bool h12=true;
 bool PM;
 bool Century=false;
-const int t25pin=5;
-const int t10pin=6;
+const int t25pin=4;
+const int t10pin=5;
+const int StopPin=6;
+const int buzzerPin =12;
 
 bool  setedTimer=false;
 bool  goTimer = false;
@@ -75,6 +87,7 @@ void setup() {
 
 pinMode(t25pin,INPUT);
 pinMode(t10pin,INPUT);
+pinMode(buzzerPin, OUTPUT);
   /** 
    *  there are 2 memory areas embedded in the e-paper display
    *  and once the display is refreshed, the memory area will be auto-toggled,
@@ -176,6 +189,10 @@ void loop() {
 
   int val25 = digitalRead(t25pin);
   int val10 = digitalRead(t10pin);
+  int Stoped = digitalRead(StopPin);
+  if(Stoped==HIGH){
+    goOrStop(false);
+  }
   if(val25 ==HIGH){
      pushed=pushed+1;
      if(goTimer==true){
@@ -201,13 +218,13 @@ void loop() {
    }
    else{
     if(setedTimer==false){
-       setTimer(10);
+       setTimer(1);
     }
     goOrStop(true);
    }
    
     if(pushed>3){
-      setTimer(10);
+      setTimer(1);
       goOrStop(true);
       pushed=0;
     } 
@@ -309,7 +326,16 @@ void showTimer(){
   if(TimerSecond<=0){
     goOrStop(false);
     setedTimer=false;
+    buzzer();
   }
+}
+void buzzer(){
+  int melody[7] = {Do, Re, Mi, Fa, So, La, Si};
+  for (int i = 0;i < 1; i++) {
+    tone(buzzerPin, 5474);
+    delay(50);  
+  }
+  noTone(buzzerPin);
 }
 
 void pClock(){
