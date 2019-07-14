@@ -44,11 +44,13 @@ DS3231 Clock;
 unsigned char image[1024];
 Paint paint(image, 0, 0);    // width should be the multiple of 8 
 Epd epd;
-unsigned long time_start_ms;
-unsigned long time_now_s;
+//unsigned long time_start_ms;
+//unsigned long time_now_s;
 int x=0;
 int times=0;
 int lastMinute=0;
+int lastSecond=0;
+int TimerSecond=0;
 
 bool h12=true;
 bool PM;
@@ -56,13 +58,11 @@ bool Century=false;
 const int t25pin=5;
 const int t10pin=6;
 
-const int m25=25;
-const int m10=10;
+bool  setedTimer=false;
 bool  goTimer = false;
-
-int nowHour=0;
-int nowMin=0;
-int nowSec=0;
+int lastVal25=LOW;
+int lastVal10=LOW;
+int pushed=0;
 
 void setup() {
   // put your setup code here, to run once:
@@ -165,48 +165,7 @@ delay(500);
 }
 
 void loop() {
-//int second,minute,hour,date,month,year,temperature; 
-//  second=Clock.getSecond();
-//  minute=Clock.getMinute();
-//  h12=true;
-//  hour=Clock.getHour(h12, PM);
-//
-//  date=Clock.getDate();
-//  month=Clock.getMonth(Century);
-//  year=Clock.getYear();
-//  
-//  //temperature=Clock.getTemperature();
-//  
-//  Serial.print("20");
-//  Serial.print(year,DEC);
-//  Serial.print('-');
-//  Serial.print(month,DEC);
-//  Serial.print('-');
-//  Serial.print(date,DEC);
-//  Serial.print(' ');
-//
-//  Serial.print(' ');
-//  Serial.print(hour,DEC);  
-//  Serial.print(' ');
-//    if (h12) {
-//    if (PM) {
-//      Serial.print(" PM ");
-//    } else {
-//      Serial.print(" AM ");
-//    }
-//  } else {
-//    Serial.print(" 24h ");
-//  }
-//  Serial.print(minute,DEC);
-//  Serial.print(':');
-//  Serial.print(second,DEC);
-//  Serial.print('\n');
-//  //Serial.print("Temperature=");
-//  //Serial.print(temperature); 
-//  Serial.print('\n');
-//  
-//  Serial.print("pTimer");
-//  Serial.print('\n');
+
 
   Serial.print("wait to getSecond()");
   Serial.print("\n");
@@ -218,109 +177,68 @@ void loop() {
   int val25 = digitalRead(t25pin);
   int val10 = digitalRead(t10pin);
   if(val25 ==HIGH){
-   if(goTimer=true){
-      goOrStop(false);
-   }
-   else{
-    setTimer(25);
-    goOrStop(true);
- 
-   } 
+     pushed=pushed+1;
+     if(goTimer==true){
+        goOrStop(false);
+     }
+     else{
+      if(setedTimer==false){
+       setTimer(25);
+    }
+        goOrStop(true);
+     }
+     if(pushed>3){
+      setTimer(25);
+      goOrStop(true);
+      pushed=0;
+     } 
+    
   }
   if(val10 ==HIGH){
-   if(goTimer=true){
+    pushed=pushed+1;
+   if(goTimer==true){
       goOrStop(false);
    }
    else{
-    setTimer(10);
+    if(setedTimer==false){
+       setTimer(10);
+    }
     goOrStop(true);
- 
-   } 
+   }
+   
+    if(pushed>3){
+      setTimer(10);
+      goOrStop(true);
+      pushed=0;
+    } 
   }
   if(goTimer==true){
-    goingTimer()
+    goingTimer();
     showTimer();
     delay(500);
   }
   
 
-//pFont1();
-//delay(3000);
-//pFont2();
 
   Serial.print("pClock");
   Serial.print('\n');
   pClock();  
   //delay(1000);
   
-  Serial.print("pToDay");
-  Serial.print('\n');
-  pToDay();
+//  Serial.print("pToDay");
+//  Serial.print('\n');
+//  pToDay();
 //  
   //delay(1000);
 }
 
  
-
-//void pTimer(int setMinute){
-//  char time_string[] = {'0', '0', ':', '0', '0', '\0'};
-// 
-//  int minute_units_digit , minute_tens_digit; 
-//
-//  int nowSec = Clock.getSecond();
-//  int nowMin = Clock.getMinute();
-//  int nowHour = Clock.getHour();
-//  int nowDay = Clock.getDate();
-//  
-//  int goalSec = 0;
-//  int goalMin = (nowMin+setMinute)%60;
-//  if((nowMin+setMinute)/60==1)
-//     goalHour = (nowHour+1)%24;
-//  else{
-//      goalHour=nowHour;
-//  }
-//  if((nowHour+1)%24==1){
-//    goalDay=1;
-//  }
-//  else{ 
-//    goalDay = 0;
-//  }
-//  
-//  if(setMinute>9){
-//    minute_tens_digit = setMinute/10; 
-//    minute_units_digit = setMinute%10;
-//  }
-//  else{
-//    minute_tens_digit = 0; 
-//    minute_units_digit = setMinute%10;
-//  }
-// 
-//  time_string[0] = minute_tens_digit + '0';
-//  time_string[1] = minute_units_digit + '0';
-//  time_string[3] =  '0';
-//  time_string[4] =  '0';
-//  Serial.print("inside "+ String(time_string));
-////  for(int i =0 ;i<5;i++){
-////    time_string[i]= getFont18Char(time_string[i]);
-////  }
-//  
-//  paint.SetWidth(20);
-//  paint.SetHeight(100);
-//  paint.SetRotate(ROTATE_90);
-//
-//  paint.Clear(UNCOLORED);
-//  paint.DrawStringAt(0, 4, time_string, &MaruGothic12 ,COLORED);
-//  Serial.print("SetFrameMemory");
-//  epd.SetFrameMemory(paint.GetImage(), 0, 200, paint.GetWidth(), paint.GetHeight());
-//  Serial.print("DisplayFrame");
-//  epd.DisplayFrame();
-//  Serial.print("Finish");
-//}
 void setTimer(int t){
-  lastSecond=t*60;
+  TimerSecond=t*60;
+  setedTimer=true;
 }
 void goOrStop(bool go){
-  if(true){
+  if(go){
     lastSecond=Clock.getSecond();
     goTimer=true;
   }
@@ -342,11 +260,11 @@ void goingTimer(){
  }
 }
 void showTimer(){
-   char time_string[] = {'0', '0', ':', '0', '0', '\0'};
+   char time_string[] = {'F','G','0', '0', ':', '0', '0', '\0'};
     int minute_units_digit , minute_tens_digit;
     int second_units_digit , second_tens_digit;
-    int m = lastSecond/60;
-    int sec = lastSecond % 60;
+    int m = TimerSecond/60;
+    int sec = TimerSecond % 60;
 
   if(m>9){
     minute_tens_digit = m/10; 
@@ -358,61 +276,42 @@ void showTimer(){
   }
 
   if(sec>9){
-    second_units_digit = sec/10; 
+    second_tens_digit = sec/10; 
     second_units_digit = sec%10;
   }
   else{
-    second_units_digit = 0; 
+    second_tens_digit = 0; 
     second_units_digit = sec%10;
   }
 
-  time_string[0] = minute_tens_digit + '0';
-  time_string[1] = minute_units_digit + '0';
-  time_string[3] =  '0';
-  time_string[4] =  '0';
+  time_string[2] = minute_tens_digit + '0';
+  time_string[3] = minute_units_digit + '0';
+  time_string[5] =  second_tens_digit + '0';
+  time_string[6] =  second_units_digit + '0';
   Serial.print("inside "+ String(time_string));
 //  for(int i =0 ;i<5;i++){
 //    time_string[i]= getFont18Char(time_string[i]);
 //  }
   
   paint.SetWidth(20);
-  paint.SetHeight(100);
+  paint.SetHeight(112);
   paint.SetRotate(ROTATE_90);
 
   paint.Clear(UNCOLORED);
   paint.DrawStringAt(0, 4, time_string, &MaruGothic12 ,COLORED);
   Serial.print("SetFrameMemory");
-  epd.SetFrameMemory(paint.GetImage(), 0, 200, paint.GetWidth(), paint.GetHeight());
+  epd.SetFrameMemory(paint.GetImage(), 0, 170, paint.GetWidth(), paint.GetHeight());
   Serial.print("DisplayFrame");
   epd.DisplayFrame();
   Serial.print("Finish");
+
+
+  if(TimerSecond<=0){
+    goOrStop(false);
+    setedTimer=false;
+  }
 }
-//void pFont1(){
-//  char st[]={' ','!','"','#','$','%','&','\'','(','\0'};
-//  paint.SetWidth(30);
-//  paint.SetHeight(290);
-//  paint.SetRotate(ROTATE_90);
-//
-//  paint.Clear(UNCOLORED);
-//  paint.DrawStringAt(0, 4, st, &TaipeiSans18 ,COLORED);
-//  epd.SetFrameMemory(paint.GetImage(), 60, 0, paint.GetWidth(), paint.GetHeight());
-//  epd.DisplayFrame();
-//}
-//void pFont2(){
-//  char st[]={'年','月','日','時','分','秒','上','\0'};
-//  for(int i =0 ;i<3;i++){
-//    st[i]= getFont18Char(st[i]);
-//  }
-//  
-//  paint.SetWidth(60);
-//  paint.SetHeight(200);
-//  paint.SetRotate(ROTATE_90);
-//
-//  paint.Clear(UNCOLORED);
-//  paint.DrawStringAt(0, 4, st, &TaipeiSans18 ,COLORED);
-//  epd.SetFrameMemory(paint.GetImage(), 80, 0, paint.GetWidth(), paint.GetHeight());
-//  epd.DisplayFrame();
-//}
+
 void pClock(){
   char time_string[] = {'0', '0', ':', '0', '0', '\0'};
   int minute , hour;
@@ -464,18 +363,22 @@ if(minute!=lastMinute){
     epd.ClearFrameMemory(0xFF);   // bit set = white, bit reset = black
     epd.DisplayFrame();
     
-    Serial.print("pToDay");
-    Serial.print('\n');
-    pToDay();        
-    epd.SetFrameMemory(paint.GetImage(), 80, 5, paint.GetWidth(), paint.GetHeight());
+    //Serial.print("pToDay");
+    //Serial.print('\n');
+    //pToDay();        
+    epd.SetFrameMemory(paint.GetImage(), 60, 3, paint.GetWidth(), paint.GetHeight());
     epd.DisplayFrame();
     
-    Serial.print("pToDay");
-    Serial.print('\n');
-    pToDay();    
-    epd.SetFrameMemory(paint.GetImage(), 80, 5, paint.GetWidth(), paint.GetHeight());
+    //Serial.print("pToDay");
+    //Serial.print('\n');
+    //pToDay();    
+    epd.SetFrameMemory(paint.GetImage(), 60, 3, paint.GetWidth(), paint.GetHeight());
    
     epd.DisplayFrame();
+    delay(500);
+    pToDay();
+    delay(500);
+    pToDay();
     lastMinute=minute;
 }
   
@@ -536,11 +439,9 @@ void pToDay(){
   paint.Clear(UNCOLORED);
   paint.DrawStringAt(0, 4, char_string, &MaruGothic12 ,COLORED);
   epd.SetFrameMemory(paint.GetImage(), 30, 0, paint.GetWidth(), paint.GetHeight());
-  //epd.DisplayFrame();
+  epd.DisplayFrame();
 }
-void pAMPM(){
-  }
-  
+
 char getFont48Char(char input){
   char output=' ';
 
