@@ -381,7 +381,7 @@ void pClock(){
    Serial.print("pclock  ROTATE_90");
   Serial.print('\n');
   paint.Clear(UNCOLORED);
-  paint.DrawStringAt(0, 4, time_string, &Genyog36 ,COLORED);
+  paint.DrawStringAt(0, 4, time_string, &Genyog48 ,COLORED);
   
 if(minute!=lastMinute){
     epd.ClearFrameMemory(0xFF);   // bit set = white, bit reset = black
