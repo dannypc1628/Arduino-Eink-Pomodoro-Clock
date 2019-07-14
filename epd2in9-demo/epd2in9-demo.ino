@@ -56,6 +56,14 @@ bool Century=false;
 const int t25pin=5;
 const int t10pin=6;
 
+const int m25=25;
+const int m10=10;
+bool  goTimer = false;
+
+int nowHour=0;
+int nowMin=0;
+int nowSec=0;
+
 void setup() {
   // put your setup code here, to run once:
   Wire.begin();
@@ -210,16 +218,31 @@ void loop() {
   int val25 = digitalRead(t25pin);
   int val10 = digitalRead(t10pin);
   if(val25 ==HIGH){
-    pTimer(25);
+   if(goTimer=true){
+      goOrStop(false);
+   }
+   else{
+    setTimer(25);
+    goOrStop(true);
+ 
+   } 
   }
-  if(val10==HIGH){
-    pTimer(10);
+  if(val10 ==HIGH){
+   if(goTimer=true){
+      goOrStop(false);
+   }
+   else{
+    setTimer(10);
+    goOrStop(true);
+ 
+   } 
   }
-  else{
-    pTimer(sec);
-    }
+  if(goTimer==true){
+    goingTimer()
+    showTimer();
+    delay(500);
+  }
   
-  delay(500);
 
 //pFont1();
 //delay(3000);
@@ -239,37 +262,127 @@ void loop() {
 
  
 
-void pTimer(int setMinute){
-  char time_string[] = {'0', '0', ':', '0', '0', '\0'};
- 
-  int minute_units_digit , minute_tens_digit; 
+//void pTimer(int setMinute){
+//  char time_string[] = {'0', '0', ':', '0', '0', '\0'};
+// 
+//  int minute_units_digit , minute_tens_digit; 
+//
+//  int nowSec = Clock.getSecond();
+//  int nowMin = Clock.getMinute();
+//  int nowHour = Clock.getHour();
+//  int nowDay = Clock.getDate();
+//  
+//  int goalSec = 0;
+//  int goalMin = (nowMin+setMinute)%60;
+//  if((nowMin+setMinute)/60==1)
+//     goalHour = (nowHour+1)%24;
+//  else{
+//      goalHour=nowHour;
+//  }
+//  if((nowHour+1)%24==1){
+//    goalDay=1;
+//  }
+//  else{ 
+//    goalDay = 0;
+//  }
+//  
+//  if(setMinute>9){
+//    minute_tens_digit = setMinute/10; 
+//    minute_units_digit = setMinute%10;
+//  }
+//  else{
+//    minute_tens_digit = 0; 
+//    minute_units_digit = setMinute%10;
+//  }
+// 
+//  time_string[0] = minute_tens_digit + '0';
+//  time_string[1] = minute_units_digit + '0';
+//  time_string[3] =  '0';
+//  time_string[4] =  '0';
+//  Serial.print("inside "+ String(time_string));
+////  for(int i =0 ;i<5;i++){
+////    time_string[i]= getFont18Char(time_string[i]);
+////  }
+//  
+//  paint.SetWidth(20);
+//  paint.SetHeight(100);
+//  paint.SetRotate(ROTATE_90);
+//
+//  paint.Clear(UNCOLORED);
+//  paint.DrawStringAt(0, 4, time_string, &MaruGothic12 ,COLORED);
+//  Serial.print("SetFrameMemory");
+//  epd.SetFrameMemory(paint.GetImage(), 0, 200, paint.GetWidth(), paint.GetHeight());
+//  Serial.print("DisplayFrame");
+//  epd.DisplayFrame();
+//  Serial.print("Finish");
+//}
+void setTimer(int t){
+  lastSecond=t*60;
+}
+void goOrStop(bool go){
+  if(true){
+    lastSecond=Clock.getSecond();
+    goTimer=true;
+  }
+  else{
+    goTimer=false;
+  }
+  
+}
+void goingTimer(){
+ int nowSec = Clock.getSecond();
 
-  if(setMinute>9){
-    minute_tens_digit = setMinute/10; 
-    minute_units_digit = setMinute%10;
+ if(nowSec>lastSecond){
+  TimerSecond =TimerSecond-(nowSec-lastSecond);
+  lastSecond=nowSec;
+ }
+ if(nowSec<lastSecond){
+  TimerSecond=TimerSecond-(60+nowSec-lastSecond);
+  lastSecond=nowSec;
+ }
+}
+void showTimer(){
+   char time_string[] = {'0', '0', ':', '0', '0', '\0'};
+    int minute_units_digit , minute_tens_digit;
+    int second_units_digit , second_tens_digit;
+    int m = lastSecond/60;
+    int sec = lastSecond % 60;
+
+  if(m>9){
+    minute_tens_digit = m/10; 
+    minute_units_digit = m%10;
   }
   else{
     minute_tens_digit = 0; 
-    minute_units_digit = setMinute%10;
+    minute_units_digit = m%10;
   }
- 
+
+  if(sec>9){
+    second_units_digit = sec/10; 
+    second_units_digit = sec%10;
+  }
+  else{
+    second_units_digit = 0; 
+    second_units_digit = sec%10;
+  }
+
   time_string[0] = minute_tens_digit + '0';
   time_string[1] = minute_units_digit + '0';
   time_string[3] =  '0';
   time_string[4] =  '0';
   Serial.print("inside "+ String(time_string));
-  for(int i =0 ;i<5;i++){
-    time_string[i]= getFont18Char(time_string[i]);
-  }
+//  for(int i =0 ;i<5;i++){
+//    time_string[i]= getFont18Char(time_string[i]);
+//  }
   
-  paint.SetWidth(30);
-  paint.SetHeight(125);
+  paint.SetWidth(20);
+  paint.SetHeight(100);
   paint.SetRotate(ROTATE_90);
 
   paint.Clear(UNCOLORED);
-  paint.DrawStringAt(0, 4, time_string, &Genyog12 ,COLORED);
+  paint.DrawStringAt(0, 4, time_string, &MaruGothic12 ,COLORED);
   Serial.print("SetFrameMemory");
-  epd.SetFrameMemory(paint.GetImage(), 0, 180, paint.GetWidth(), paint.GetHeight());
+  epd.SetFrameMemory(paint.GetImage(), 0, 200, paint.GetWidth(), paint.GetHeight());
   Serial.print("DisplayFrame");
   epd.DisplayFrame();
   Serial.print("Finish");
@@ -337,24 +450,30 @@ void pClock(){
     time_string[i]= getFont48Char(time_string[i]);
   }
   
-  paint.SetWidth(40);
-  paint.SetHeight(150);
+  paint.SetWidth(48);
+  paint.SetHeight(160);
   paint.SetRotate(ROTATE_90);
    Serial.print("pclock  ROTATE_90");
   Serial.print('\n');
   paint.Clear(UNCOLORED);
-  paint.DrawStringAt(0, 4, time_string, &NotoJP50 ,COLORED);
+  paint.DrawStringAt(0, 4, time_string, &Genyog36 ,COLORED);
   
 if(minute!=lastMinute){
     epd.ClearFrameMemory(0xFF);   // bit set = white, bit reset = black
     epd.DisplayFrame();
     epd.ClearFrameMemory(0xFF);   // bit set = white, bit reset = black
     epd.DisplayFrame();
-
-    epd.SetFrameMemory(paint.GetImage(), 80, 0, paint.GetWidth(), paint.GetHeight());
-   
+    
+    Serial.print("pToDay");
+    Serial.print('\n');
+    pToDay();        
+    epd.SetFrameMemory(paint.GetImage(), 80, 5, paint.GetWidth(), paint.GetHeight());
     epd.DisplayFrame();
-        epd.SetFrameMemory(paint.GetImage(), 80, 0, paint.GetWidth(), paint.GetHeight());
+    
+    Serial.print("pToDay");
+    Serial.print('\n');
+    pToDay();    
+    epd.SetFrameMemory(paint.GetImage(), 80, 5, paint.GetWidth(), paint.GetHeight());
    
     epd.DisplayFrame();
     lastMinute=minute;
@@ -366,25 +485,31 @@ void pToDay(){
   String year_string="";
   String month_string="";
   String date_string="";
+  String wek_string="";
   String concat_string="";
-  int year , month , date;
+  int year , month , date,wek;
 
     Serial.print("pToDay  1");
   Serial.print('\n');
   
   year=Clock.getYear();
-  year_string ="20"+String(year)+" ";//年
+  year_string ="20"+String(year)+"*";//年
   Serial.print("pToDay 2  get year is ");
   Serial.print(year_string);
   Serial.print("\n");
   month=Clock.getMonth(Century);
-  month_string = String(month)+"!";//月
+  month_string = String(month)+"+";//月
    
   date=Clock.getDate();
-  date_string = String(date)+"\"";//日
+  date_string = String(date)+",";//日
   Serial.print("pToDay  3");
   Serial.print('\n');
-  concat_string = year_string + month_string + date_string;
+
+  wek =Clock.getDoW();
+  
+  wek_string = " >?"+String(char(wek+' '));
+  
+  concat_string = year_string + month_string + date_string + wek_string;
   
   int len=concat_string.length()+1;
   char char_string[len];
@@ -394,22 +519,22 @@ void pToDay(){
   
 //  Serial.print("\n");
 //  Serial.print(concat_string);
-  for(int i=0;i<len-1;i++){
-    if(char_string[i]>='0'){
-      char_string[i]=getFont18Char(char_string[i]);
-    }
-  }
+//  for(int i=0;i<len-1;i++){
+//    if(char_string[i]>='0'){
+//      char_string[i]=getFont18Char(char_string[i]);
+//    }
+//  }
 //  Serial.print("字元轉換 \n");
 //  Serial.print(char_string);
 //  Serial.print("\n");
     Serial.print("pToDay  5");
   Serial.print('\n');
-  paint.SetWidth(30);
-  paint.SetHeight(250);
+  paint.SetWidth(18);
+  paint.SetHeight(240);
   paint.SetRotate(ROTATE_90);
 
   paint.Clear(UNCOLORED);
-  paint.DrawStringAt(0, 4, char_string, &Genyog12 ,COLORED);
+  paint.DrawStringAt(0, 4, char_string, &MaruGothic12 ,COLORED);
   epd.SetFrameMemory(paint.GetImage(), 30, 0, paint.GetWidth(), paint.GetHeight());
   //epd.DisplayFrame();
 }
@@ -458,136 +583,6 @@ char getFont48Char(char input){
       output='+';
       break;
 
-  }
-
-  return output;
-}
-
-  
-char getFont18Char(char input){
-  char output=' ';
-
-  switch(input){
-
-    case '年':
-      output=' ';
-      break;
-    case '月':
-      output='!';
-      break;
-    case '日':
-      output='"';
-      break;
-    case '時':
-      output='#';
-      break;
-    case '點':
-      output='$';
-      break;
-    case '分':
-      output='%';
-      break;
-    case '秒':
-      output='&';
-      break;
-    case '上':
-      output=',';
-      break;
-    case '下':
-      output='(';
-      break;
-    case '午':
-      output=')';
-      break;
-    case '星':
-      output='*';
-      break;
-    case '期':
-      output='+';
-      break;
-
-    case '一':
-      output=',';
-      break;
-    case '二':
-      output='-';
-      break;
-    case '三':
-      output='.';
-      break;
-    case '四':
-      output='/';
-      break;
-    case '五':
-      output='0';
-      break;
-    case '六':
-      output='1';
-      break;
-    case '日':
-      output='2';
-      break;
-    case ' ':
-      output='3';
-      break;
-    case '(':
-      output='4';
-      break;
-    case ')':
-      output='5';
-      break;
-    case '/':
-      output='6';
-      break;
-    case '0':
-      output='7';
-      break;
-
-    case '1':
-      output='8';
-      break;
-    case '2':
-      output='9';
-      break;
-    case '3':
-      output=':';
-      break;
-    case '4':
-      output=';';
-      break;
-    case '5':
-      output='<';
-      break;
-    case '6':
-      output='=';
-      break;
-    case '7':
-      output='>';
-      break;
-    case '8':
-      output='?';
-      break;
-    case '9':
-      output='@';
-      break;
-    case ':':
-      output='A';
-      break;
-    case '倒':
-      output='B';
-      break;
-    case '數':
-      output='C';
-      break;
-    case 'A':
-      output='D';
-      break;
-    case 'P':
-      output='E';
-      break;
-    case 'M':
-      output='F';
-      break;
   }
 
   return output;
