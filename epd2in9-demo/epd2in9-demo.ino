@@ -218,13 +218,13 @@ void loop() {
    }
    else{
     if(setedTimer==false){
-       setTimer(1);
+       setTimer(10);
     }
     goOrStop(true);
    }
    
     if(pushed>3){
-      setTimer(1);
+      setTimer(10);
       goOrStop(true);
       pushed=0;
     } 
@@ -344,7 +344,7 @@ void pClock(){
   int hour_units_digit , hour_tens_digit; 
   int minute_units_digit , minute_tens_digit; 
   
-  
+  h12=true;
   hour=Clock.getHour(h12, PM);
   minute=Clock.getMinute();
 
@@ -374,24 +374,28 @@ void pClock(){
   for(int i =0 ;i<5;i++){
     time_string[i]= getFont48Char(time_string[i]);
   }
+  char time_string1 []={'0','0',':','\0'};
+  time_string1[0]=time_string[0];
+  time_string1[1]=time_string[1];
+  time_string1[2]=time_string[2];
   
-  paint.SetWidth(48);
-  paint.SetHeight(160);
+  paint.SetWidth(60);
+  paint.SetHeight(120);
   paint.SetRotate(ROTATE_90);
    Serial.print("pclock  ROTATE_90");
   Serial.print('\n');
   paint.Clear(UNCOLORED);
-  paint.DrawStringAt(0, 4, time_string, &Genyog48 ,COLORED);
+  paint.DrawStringAt(0, 4, time_string1, &Genyog48 ,COLORED);
   
 if(minute!=lastMinute){
+  if(minute==0){
+    buzzer();
+  }
     epd.ClearFrameMemory(0xFF);   // bit set = white, bit reset = black
     epd.DisplayFrame();
     epd.ClearFrameMemory(0xFF);   // bit set = white, bit reset = black
     epd.DisplayFrame();
-    
-    //Serial.print("pToDay");
-    //Serial.print('\n');
-    //pToDay();        
+
     epd.SetFrameMemory(paint.GetImage(), 60, 3, paint.GetWidth(), paint.GetHeight());
     epd.DisplayFrame();
     
@@ -399,6 +403,31 @@ if(minute!=lastMinute){
     //Serial.print('\n');
     //pToDay();    
     epd.SetFrameMemory(paint.GetImage(), 60, 3, paint.GetWidth(), paint.GetHeight());
+   
+    epd.DisplayFrame();
+    delay(500);
+    char time_string2 []={'0','0','\0'};
+  time_string2[0]=time_string[3];
+  time_string2[1]=time_string[4];
+  
+  paint.SetWidth(60);
+  paint.SetHeight(80);
+  paint.SetRotate(ROTATE_90);
+   Serial.print("pclock  ROTATE_90");
+  Serial.print('\n');
+  paint.Clear(UNCOLORED);
+  paint.DrawStringAt(0, 4, time_string2, &Genyog48 ,COLORED);
+  
+    //Serial.print("pToDay");
+    //Serial.print('\n');
+    //pToDay();        
+    epd.SetFrameMemory(paint.GetImage(), 60, 123, paint.GetWidth(), paint.GetHeight());
+    epd.DisplayFrame();
+    
+    //Serial.print("pToDay");
+    //Serial.print('\n');
+    //pToDay();    
+    epd.SetFrameMemory(paint.GetImage(), 60, 123, paint.GetWidth(), paint.GetHeight());
    
     epd.DisplayFrame();
     delay(500);
