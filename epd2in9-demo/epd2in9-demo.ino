@@ -35,15 +35,6 @@
 #define UNCOLORED   1
 
 
-#define Do  523
-#define Re  587
-#define Mi  659
-#define Fa  698
-#define So  784
-#define La  880
-#define Si  988
-
-
 DS3231 Clock;
 /**
   * Due to RAM not enough in Arduino UNO, a frame buffer is not allowed.
@@ -57,7 +48,7 @@ Epd epd;
 //unsigned long time_start_ms;
 //unsigned long time_now_s;
 int x=0;
-int times=0;
+
 int lastMinute=0;
 int lastSecond=0;
 int TimerSecond=0;
@@ -84,10 +75,10 @@ void setup() {
       Serial.print("e-Paper init failed");
       return;
   }
-
-pinMode(t25pin,INPUT);
-pinMode(t10pin,INPUT);
-pinMode(buzzerPin, OUTPUT);
+  
+  pinMode(t25pin,INPUT);
+  pinMode(t10pin,INPUT);
+  pinMode(buzzerPin, OUTPUT);
   /** 
    *  there are 2 memory areas embedded in the e-paper display
    *  and once the display is refreshed, the memory area will be auto-toggled,
@@ -104,47 +95,7 @@ pinMode(buzzerPin, OUTPUT);
   paint.SetHeight(90);
 
   /* For simplicity, the arguments are explicit numerical coordinates */
-//  paint.Clear(UNCOLORED);
-//  paint.DrawStringAt(0, 4, "Hello world!", &TaipeiSans18, COLORED);
-//  epd.SetFrameMemory(paint.GetImage(), 30, 10, paint.GetWidth(), paint.GetHeight());
-//  epd.DisplayFrame();
-//  delay(3000);
-//  
-//  
-//  paint.Clear(UNCOLORED);
-//  paint.DrawStringAt(0, 4, "e-Paper Demo", &Font16, COLORED);
-//  epd.SetFrameMemory(paint.GetImage(), 0, 30, paint.GetWidth(), paint.GetHeight());
-//  epd.DisplayFrame();
-//  delay(1500);
-//
-//  paint.SetWidth(64);
-//  paint.SetHeight(64);
-//  
-//  paint.Clear(UNCOLORED);
-//  paint.DrawRectangle(0, 0, 40, 50, COLORED);
-//  paint.DrawLine(0, 0, 40, 50, COLORED);
-//  paint.DrawLine(40, 0, 0, 50, COLORED);
-//  epd.SetFrameMemory(paint.GetImage(), 16, 60, paint.GetWidth(), paint.GetHeight());
-//  delay(1500);
-//
-//  paint.Clear(UNCOLORED);
-//  paint.DrawCircle(32, 32, 30, COLORED);
-//  epd.SetFrameMemory(paint.GetImage(), 72, 60, paint.GetWidth(), paint.GetHeight());
-//  delay(1500);
-//
-//  paint.Clear(UNCOLORED);
-//  paint.DrawFilledRectangle(0, 0, 40, 50, COLORED);
-//  epd.SetFrameMemory(paint.GetImage(), 16, 130, paint.GetWidth(), paint.GetHeight());
-//  delay(1500);
-//  
-//  paint.SetWidth(64);
-//  paint.SetHeight(64);
-//  paint.Clear(UNCOLORED);
-//  paint.DrawFilledCircle(32, 32, 30, COLORED);
-//  epd.SetFrameMemory(paint.GetImage(), 72, 130, paint.GetWidth(), paint.GetHeight());
-//  epd.DisplayFrame();
-//
-//  delay(2000);
+
 
   if (epd.Init(lut_partial_update) != 0) {
       Serial.print("e-Paper init failed");
@@ -157,16 +108,7 @@ pinMode(buzzerPin, OUTPUT);
    *  i.e. the next action of SetFrameMemory will set the other memory area
    *  therefore you have to set the frame memory and refresh the display twice.
    */
-//  epd.SetFrameMemory(IMAGE_DATA);
-//  epd.DisplayFrame();
-//  epd.SetFrameMemory(IMAGE_DATA2);
-//  epd.DisplayFrame();
-//
-//epd.ClearFrameMemory(0xFF);   // bit set = white, bit reset = black
-//epd.DisplayFrame();
-//epd.ClearFrameMemory(0xFF);   // bit set = white, bit reset = black
-//epd.DisplayFrame();
-//
+
 epd.ClearFrameMemory(0xFF);   // bit set = white, bit reset = black
 epd.DisplayFrame();
 delay(500);
@@ -240,13 +182,7 @@ void loop() {
   Serial.print("pClock");
   Serial.print('\n');
   pClock();  
-  //delay(1000);
-  
-//  Serial.print("pToDay");
-//  Serial.print('\n');
-//  pToDay();
-//  
-  //delay(1000);
+
 }
 
  
@@ -254,6 +190,7 @@ void setTimer(int t){
   TimerSecond=t*60;
   setedTimer=true;
 }
+
 void goOrStop(bool go){
   if(go){
     lastSecond=Clock.getSecond();
@@ -264,6 +201,7 @@ void goOrStop(bool go){
   }
   
 }
+
 void goingTimer(){
  int nowSec = Clock.getSecond();
 
@@ -276,6 +214,7 @@ void goingTimer(){
   lastSecond=nowSec;
  }
 }
+
 void showTimer(){
    char time_string[] = {'F','G','0', '0', ':', '0', '0', '\0'};
     int minute_units_digit , minute_tens_digit;
@@ -306,9 +245,7 @@ void showTimer(){
   time_string[5] =  second_tens_digit + '0';
   time_string[6] =  second_units_digit + '0';
   Serial.print("inside "+ String(time_string));
-//  for(int i =0 ;i<5;i++){
-//    time_string[i]= getFont18Char(time_string[i]);
-//  }
+
   
   paint.SetWidth(20);
   paint.SetHeight(112);
@@ -329,8 +266,9 @@ void showTimer(){
     buzzer();
   }
 }
+
 void buzzer(){
-  int melody[7] = {Do, Re, Mi, Fa, So, La, Si};
+
   for (int i = 0;i < 1; i++) {
     tone(buzzerPin, 5474);
     delay(50);  
@@ -391,22 +329,21 @@ if(minute!=lastMinute){
   if(minute==0){
     buzzer();
   }
-    epd.ClearFrameMemory(0xFF);   // bit set = white, bit reset = black
-    epd.DisplayFrame();
-    epd.ClearFrameMemory(0xFF);   // bit set = white, bit reset = black
-    epd.DisplayFrame();
+  epd.ClearFrameMemory(0xFF);   // bit set = white, bit reset = black
+  epd.DisplayFrame();
+ 
+  epd.ClearFrameMemory(0xFF);   // bit set = white, bit reset = black
+  epd.DisplayFrame();
 
-    epd.SetFrameMemory(paint.GetImage(), 60, 3, paint.GetWidth(), paint.GetHeight());
-    epd.DisplayFrame();
-    
-    //Serial.print("pToDay");
-    //Serial.print('\n');
-    //pToDay();    
-    epd.SetFrameMemory(paint.GetImage(), 60, 3, paint.GetWidth(), paint.GetHeight());
-   
-    epd.DisplayFrame();
-    delay(500);
-    char time_string2 []={'0','0','\0'};
+
+  epd.SetFrameMemory(paint.GetImage(), 60, 3, paint.GetWidth(), paint.GetHeight());
+  epd.DisplayFrame();
+      
+  epd.SetFrameMemory(paint.GetImage(), 60, 3, paint.GetWidth(), paint.GetHeight());
+  epd.DisplayFrame();
+  delay(300);
+  
+  char time_string2 []={'0','0','\0'};
   time_string2[0]=time_string[3];
   time_string2[1]=time_string[4];
   
@@ -418,21 +355,16 @@ if(minute!=lastMinute){
   paint.Clear(UNCOLORED);
   paint.DrawStringAt(0, 4, time_string2, &Genyog48 ,COLORED);
   
-    //Serial.print("pToDay");
-    //Serial.print('\n');
-    //pToDay();        
+      
     epd.SetFrameMemory(paint.GetImage(), 60, 123, paint.GetWidth(), paint.GetHeight());
     epd.DisplayFrame();
     
-    //Serial.print("pToDay");
-    //Serial.print('\n');
-    //pToDay();    
     epd.SetFrameMemory(paint.GetImage(), 60, 123, paint.GetWidth(), paint.GetHeight());
-   
     epd.DisplayFrame();
-    delay(500);
+
+    delay(300);
     pToDay();
-    delay(500);
+    delay(300);
     pToDay();
     lastMinute=minute;
 }
@@ -447,46 +379,33 @@ void pToDay(){
   String concat_string="";
   int year , month , date,wek;
 
-    Serial.print("pToDay  1");
-  Serial.print('\n');
   
   year=Clock.getYear();
   year_string ="20"+String(year)+"*";//年
-  Serial.print("pToDay 2  get year is ");
-  Serial.print(year_string);
-  Serial.print("\n");
+
   month=Clock.getMonth(Century);
   month_string = String(month)+"+";//月
    
   date=Clock.getDate();
   date_string = String(date)+",";//日
-  Serial.print("pToDay  3");
-  Serial.print('\n');
+
 
   wek =Clock.getDoW();
   
   wek_string = " >?"+String(char(wek+' '));
   
   concat_string = year_string + month_string + date_string + wek_string;
+  Serial.print("pToDay ");
+    Serial.print(concat_string);
+  Serial.print('\n');
+  
   
   int len=concat_string.length()+1;
   char char_string[len];
-    Serial.print("pToDay  4");
-  Serial.print('\n');
-  concat_string.toCharArray(char_string,len);
   
-//  Serial.print("\n");
-//  Serial.print(concat_string);
-//  for(int i=0;i<len-1;i++){
-//    if(char_string[i]>='0'){
-//      char_string[i]=getFont18Char(char_string[i]);
-//    }
-//  }
-//  Serial.print("字元轉換 \n");
-//  Serial.print(char_string);
-//  Serial.print("\n");
-    Serial.print("pToDay  5");
-  Serial.print('\n');
+  concat_string.toCharArray(char_string,len);
+ 
+
   paint.SetWidth(18);
   paint.SetHeight(240);
   paint.SetRotate(ROTATE_90);
